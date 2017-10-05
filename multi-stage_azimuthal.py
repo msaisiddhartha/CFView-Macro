@@ -14,19 +14,20 @@ import pylab as py
 from tabulate import tabulate
 
 # Case Data
+# Case Data
 WorkSplitR1 = 35
 dalpha = 25
 
-
-project_name = 'MSD_5sect'
+project_name = 'MSD_work'
 case_name = '4kgs_FR'
 file_dir = 'C:/Users/msais/Box Sync/Thesis Work/Multi-Stage_data/DiffuserConstArea/WorkSplitRotor1=' + \
     str(WorkSplitR1) + '/Stator' + str(dalpha) + 'deg/' + \
     project_name + '/' + project_name + '_' + case_name + '/'
 RunFile = str(project_name + '_' + case_name + '.me.cfv')
+
 # OutFile = "Scalar Data_Azimuthal averaged.txt"
 
-Quant = ['Magnitude of V', 'Magnitude of W', 'Vm', 'Vt']
+Quant = ['Magnitude of V', 'Magnitude of W', 'Vm', 'Vt', 'Wt']
 
 nsect =7
 # ------------------------------Geometry Data----------------------------------
@@ -58,7 +59,19 @@ for i in range(nsect - 2):
 
 FileOpenProject(file_dir + RunFile,)
 
+dm = [3, 14, 7]
+Viewnum = 2
+c=0
 for j in Quant:
     QntFieldScalar(j)
     for i in range(nsect):
-        RprSection(x[i][0],r[i][0],0,x[i][1],r[i][1],0,0,0,1 ,'Section '+str(i+1),0 ,'',0)
+        if i%2==0:
+            ViewActivate(RunFile + ':1')
+            RprSection(x[i][0],r[i][0],0,x[i][1],r[i][1],0,0,0,1 ,'Section '+str(i+1),0 ,'',0)
+
+ViewActivate(RunFile + ':6')
+
+
+ActivePlotCurveOutput(file_dir + j + '_1_Az_avg' + '.dat' ,'Section 1 on domain3')
+ActivePlotCurveOutput(file_dir + j + '_3_Az_avg' + '.dat' ,'Section 3 on domain14')
+ActivePlotCurveOutput(file_dir + j + '_5_Az_avg' + '.dat' ,'Section 5 on domain7')

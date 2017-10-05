@@ -1,5 +1,5 @@
 CFViewBackward(912)
-"""This macro provides CFView post-processing for multi-stage compressor.
+"""This macro provides CFView post-processing for 1.5-stage centrifugal compressor.
 It computes:
     1. Contour Plots at different spanwise sections
     2. Cartesian plots of X-Gradient of Entropy vs X-direction
@@ -17,7 +17,7 @@ from tabulate import tabulate
 WorkSplitR1 = 35
 dalpha = 25
 
-project_name = 'MSD_5sect'
+project_name = 'MSD_work'
 case_name = '4kgs_FR'
 file_dir = 'C:/Users/msais/Box Sync/Thesis Work/Multi-Stage_data/DiffuserConstArea/WorkSplitRotor1=' + \
     str(WorkSplitR1) + '/Stator' + str(dalpha) + 'deg/' + \
@@ -38,9 +38,6 @@ cl = [0.0005, 0.0004, 0.0003]  # Clearance for each row
 Z = [24, 24, 24]    # Number of blades for each row
 nu = 3.8e-5  # Kinematic viscosity
 
-chord_r1 = 0.0534744
-chord_s1 = 0.07272
-
 # Reference values
 Vref = 100.74  # velocity (Inlet velocity)
 rho = 1.2  # density
@@ -49,6 +46,33 @@ Pref = 101325  # Pressure
 w = 2 * np.pi * N / 60  # Angular Velocity
 U6 = r6 * w
 phi = (m / rho) / (U6 * ((2 * r6)**2))
+
+#=======R1 = 0.35, Dalpha = 25 and work===========
+W_hub = [114.073, 1, 287.376, 1, 243.4279, 1, 1]
+W_tip = [296.548, 1, 230.909, 1, 337.775, 1, 1]
+V_tip = [5.449, 1, 213.587, 1, 122.495, 1, 1]
+Vm_m = [124.380, 1, 130.725, 1, 135.77, 1, 1]
+chord_r1 = 0.12995
+chord_s1 = 0.07272
+#=================================================
+
+# #=======R1 = 0.35, Dalpha = 25====================
+# W_hub = [114.073, 1, 287.376, 1, 243.4279, 1, 1]
+# W_tip = [296.548, 1, 230.909, 1, 337.775, 1, 1]
+# V_tip = [5.449, 1, 213.587, 1, 122.495, 1, 1]
+# Vm_m = [124.380, 1, 130.725, 1, 135.77, 1, 1]
+# chord_r1 = 0.0534744
+# chord_s1 = 0.07272
+# #=================================================
+
+#=======R1 = 0.35, Dalpha = 35====================
+# W_hub = [114.073, 1, 287.376, 1, 282.053, 1, 1]
+# W_tip = [296.548, 1, 230.909, 1, 337.777, 1, 1]
+# V_tip = [5.449, 1, 213.587, 1, -88.299, 1, 1]
+# Vm_m = [124.380, 1, 130.725, 1, 131.775, 1, 1]
+# chord_r1 = 0.0534744
+# chord_s1 = 0.06635
+#=================================================
 
 # ---------------------------Input for Post-processing ------------------------
 # Loss file data
@@ -63,7 +87,7 @@ WRange = [[0, 400], [0, 400]]
 # Losses
 Qnt_LossParm = ["Inc_Loss", "BldeLoading_Loss", "SkinFriction_Loss",
                 "Clearance_Loss", "Recir_Loss", "DiskFriction_Loss", "Leakage_Loss", "VanelessDiff_Loss"]
-f_inc = 0.5
+
 # ------------------------------Geometry Data----------------------------------
 r = np.zeros((nsect, 2))
 x = np.zeros((nsect, 2))
@@ -95,41 +119,12 @@ bw = np.zeros(nsect)
 for i in range(nsect):
     bw[i] = ((r[i][1] - r[i][0])**2 + (x[i][1] - x[i][0])**2)**0.5
 
-
-# -------------------------Initializing Parameters-----------------------------
-# Scalar data
-Vt = np.zeros(nsect)  # Tangential Velocity
-T0 = np.zeros(nsect)  # Total Temperature
-P0 = np.zeros(nsect)  # Total Pressure
-P0rel = np.zeros(nsect)  # Relative Total Pressure
-sw = np.zeros(nsect)  # Swirl
-rm = np.zeros(nsect)  # Radius at mid-span of section plane
-s = np.zeros(nsect)  # Entropy
-W = np.zeros(nsect)
-W_tip = np.zeros(nsect)
-W_hub = np.zeros(nsect)
-V_tip = np.zeros(nsect)
-P = np.zeros(nsect)
-rho = np.zeros(nsect)
-V = np.zeros(nsect)
-Vm_m = np.zeros(nsect)
-Wt = np.zeros(nsect)
-alpha = np.zeros(nsect)
-
-cf = np.zeros(nrows)  # Skin Friction
-
-W_hub = [114.073, 1, 287.376, 1, 243.4279, 1, 1]
-W_tip = [296.548, 1, 230.909, 1, 337.775, 1, 1]
-V_tip = [5.449, 1, 213.587, 1, 122.495, 1, 1]
-Vm_m = [124.380, 1, 130.725, 1, 135.77, 1, 1]
-
-FileOpenProject(file_dir + RunFile,)
-ViewNum = 2
-
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # ==============================================================================
 # 3D View
 # ==============================================================================
+FileOpenProject(file_dir + RunFile,)
+ViewNum = 2
 
 # -----------------------Contour Plots at Differnet Span-----------------------
 
@@ -200,11 +195,31 @@ for i in range(len(span)):
 # ==============================================================================
 ViewActivate(RunFile + ':1')
 sys.stdout = open(file_dir + LossFile, "w")
+# -------------------------Initializing Parameters-----------------------------
+# Scalar data
+Vt = np.zeros(nsect)  # Tangential Velocity
+T0 = np.zeros(nsect)  # Total Temperature
+P0 = np.zeros(nsect)  # Total Pressure
+P0rel = np.zeros(nsect)  # Relative Total Pressure
+sw = np.zeros(nsect)  # Swirl
+rm = np.zeros(nsect)  # Radius at mid-span of section plane
+s = np.zeros(nsect)  # Entropy
+W = np.zeros(nsect)
+P = np.zeros(nsect)
+rho = np.zeros(nsect)
+V = np.zeros(nsect)
+Wt = np.zeros(nsect)
+alpha = np.zeros(nsect)
+Vm = np.zeros(nsect)
+
+cf = np.zeros(nrows)  # Skin Friction
 
 #---------------------Evaluating Parameters for Loss---------------------------
 ViewOpenRTZ(-0.783962, -0.683962, 0.508295, 0.608295)
 QntFieldDerived(0, 'swirl', 'sqrt((x*x)+(y*y))*Vt', '', '0')
 QntFieldDerived(0, 'r', 'sqrt((x*x)+(y*y))', '', '0')
+QntFieldDerived(0, 'Wui', 'Vt - r*2340 - Wt', '', '0')
+QntFieldDerived(0, 'Vui', 'Wt + r*2340 - Vt', '', '0')
 LimitsFull()
 ViewOriginal(1,)
 CutPlaneSave(0.11, 0, 0, 0, 0, 1, 1)  # Rotor 1 Inlet
@@ -243,12 +258,16 @@ for c in range(nsect):
     Wt[c] = WeightedIntegral()
     QntFieldScalar('atan(Vt/Vm)')
     alpha[c] = WeightedIntegral()
+    QntFieldScalar('Vm')
+    Vm[c] = WeightedIntegral()
 
 SelectFromProject('CUT9.D9')
 QntFieldScalar('Absolute Total Temperature')
 T0[-1] = WeightedIntegral()
 QntFieldScalar('Relative Total Pressure')
 P0rel[-1] = WeightedIntegral()
+QntFieldScalar('Vt')
+Vt[-1] = WeightedIntegral()
 QntFieldScalar('Absolute Total Pressure')
 P0[-1] = WeightedIntegral()
 QntFieldScalar('swirl')
@@ -260,10 +279,12 @@ s[-1] = WeightedIntegral()
 QntFieldScalar('Static Pressure')
 P[-1] = WeightedIntegral()
 QntFieldScalar('atan(Vt/Vm)')
-alpha[c] = WeightedIntegral()
+alpha[-1] = WeightedIntegral()
+QntFieldScalar('Vm')
+Vm[c] = WeightedIntegral()
 
 # print('\nJ    Swirl      T0          P0      P0rel       r     Entropy')
-Rowheaders = ['J', 'Swirl', 'T0', 'P0', 'P0rel', 'alpha', 'Entropy']
+Rowheaders = ['J', 'Swirl', 'Vt', 'Vm', 'T0', 'P0', 'P0rel', 'alpha', 'Entropy']
 mainlist = [[] for i in range(nsect + 1)]
 for i in range(nsect + 1):
     if i == 0:
@@ -272,6 +293,8 @@ for i in range(nsect + 1):
     else:
         mainlist[i].append(i)
         mainlist[i].append('%.4f' % float(sw[i - 1]))
+        mainlist[i].append('%.4f' % float(Vt[i - 1]))
+        mainlist[i].append('%.4f' % float(Vm[i - 1]))
         mainlist[i].append('%.4f' % float(T0[i - 1]))
         mainlist[i].append('%.4f' % float(P0[i - 1]))
         mainlist[i].append('%.4f' % float(P0rel[i - 1]))
@@ -301,42 +324,60 @@ dH_df = np.zeros(nrows)
 dH_lk = np.zeros(nrows)
 
 U = w * rm
-f__inc = 0.5
+f_inc = 0.5
 
 c = 0
 for i in range(nrows):
     # Aerodynamic Enthalpy
     dH_Euler[i] = Cp * (T0[c + 1] - T0[c])
+    c += 2
 
-    # Diffusion Factor for rotors
-    if i == 0:
-        ss_r1 = 2 * np.pi * rm[c] / Z[i]
-        sol_r1 = chord_r1 / ss_r1
-        DR = W[c + 1] / W[c]
-        Df[i] = 1 - DR + (DR - 1) / (2 * sol_r1)
-    elif i == 2:
-        Wratio = W[c + 1] / W_tip[c]
-        sol = Z[i] / np.pi
-        rad_ratio = r[c][1] / (0.5 * (r[c + 1][0] + r[c + 1][1]))
-        num = 0.75 * dH_Euler[i] / U[c + 1]**2
-        Df[i] = 1 - Wratio + (Wratio * num) / \
-            (sol * (1 - rad_ratio) + 2 * rad_ratio)
-    else:
-        ss_s1 = 2 * np.pi * rm[c] / Z[i]
-        sol = chord_s1 / ss_s1
-        DR = V[c + 1] / V[c]
-        Df[i] = 1 - DR + (DR - 1) / (2 * sol)
+# Diffusion Factor
+ss_r1 = 2 * np.pi * rm[0] / Z[0]
+sol_r1 = chord_r1 / ss_r1
+DH_r1 = W[1] / W[0]
+Df[0] = 1 - DH_r1 + (Wt[1] - Wt[0]) / (2 * sol_r1 * W[0])
 
+ss_s1 = 2 * np.pi * rm[2] / Z[1]
+sol_s1 = chord_s1 / ss_s1
+DH_s1 = V[3] / V[2]
+Df[1] = 1 - DH_s1 + (Vt[3] - Vt[2]) / (2 * sol_s1 * V[2])
+
+Wratio = W[5] / W_tip[4]
+sol_r2 = Z[2] / np.pi
+rad_ratio = r[4][1] / (0.5 * (r[5][0] + r[5][1]))
+num = 0.75 * dH_Euler[2] / U[5]**2
+Df[2] = 1 - Wratio + (Wratio * num) / \
+    (sol_r2 * (1 - rad_ratio) + 2 * rad_ratio)
+
+c = 0
+for i in range(nrows):
     # Incidence Loss
-    dH_inc[i] = f_inc * Wt[c]**2 / 2
-
-    """Losses calculated assuming all loss is similar to rotor 2 loss s=correlations"""
+    if i == 0:
+        dH_inc[i] = f_inc * (U[c] - Wt[c])**2 / 2
+    elif i == 1:
+        dH_inc[i] = f_inc * (U[c])
+    else:
+        dH_inc[i] = f_inc * (Vt[c] - U[c] - Wt[c])**2 / 2
+    """Losses calculated assuming all loss is similar to rotor 2 loss correlations"""
     # Blade Loading Loss
-    dH_bld[i] = 0.05 * Df[i] * U[c + 1]**2
+    if i==2:
+        dH_bld[i] = 0.05 * Df[i] * U[c + 1]**2
 
     # Skin Friction Loss
     W_avg = (V_tip[c] + V[c + 1] + W_tip[c] + 2 * W_hub[c] + 3 * W[c + 1]) / 8
     dH_sf[i] = 2 * cf[i] * Lb[i] * W_avg**2 / Dh[i]
+
+    # Disk Friction
+    Re_df = U[c + 1] * rm[c + 1] / nu
+    f_df = 0.0622 / Re_df**0.2
+    rho_avg = (rho[c] + rho[c + 1]) / 2
+    dH_df[i] = f_df * (rho_avg * rm[c + 1]**2 * U[c + 1]**3) / (4 * m)
+
+
+    # Recirculation Loss
+    dH_rc[i] = abs(8e-5 * math.sinh(3.5 * alpha[c + 1]**3)
+                   * Df[i]**2 * U[c + 1]**2)
 
     # Clearance Loss for rotor 2
     if i == 2:
@@ -345,16 +386,6 @@ for i in range(nrows):
             ((r[c + 1][0] - r[c][1]) * (1 + rho[c + 1] / rho[c]))
         dH_cl[i] = 0.6 * (cl[i] / bw[c + 1]) * abs(Vt[c + 1]) * \
             (sold * frac * abs(Vt[c + 1]) * Vm_m[c])**0.5
-
-    # Disk Friction
-    Re_df = U[c + 1] * rm[c + 1] / nu
-    f_df = 0.0622 / Re_df**0.2
-    rho_avg = (rho[c] + rho[c + 1]) / 2
-    dH_df[i] = f_df * (rho_avg * rm[c + 1]**2 * U[c + 1]**3) / (4 * m)
-
-    # Recirculation Loss
-    dH_rc[i] = abs(8e-5 * math.sinh(3.5 * alpha[c + 1]**3)
-                   * Df[i]**2 * U[c + 1]**2)
 
     # Leakage Loss for Rotors only
     if i % 2 == 0:
@@ -373,12 +404,13 @@ for i in range(nrows):
 dH_vld = Cp * T0[5] * ((P[6] / P0[6])**(1 / 3.5) -
                        (P[6] / P0[5])**(1 / 3.5))
 
-dH_int = dH_inc + dH_bld + dH_sf + dH_cl  # Internal Loss
+dH_int = dH_bld + dH_sf + dH_cl  # Internal Loss
 dH_par = dH_rc + dH_df + dH_lk  # Exernal Loss
 dH_act = dH_Euler + dH_par  # Actual Work Done
 Eff_isen = (dH_Euler - dH_int) / dH_act
 Eff_isen[1] = 0
-Rowheaders = ['Row', 'Df', 'Euler_Work'] + Qnt_LossParm[0:7] + ['Efficiency']
+
+Rowheaders = ['Row', 'Cf', 'Df', 'Euler_Work'] + Qnt_LossParm[:-1] + ['Efficiency']
 mainlist = [[] for i in range(nrows + 1)]
 for i in range(nrows + 1):
     if i == 0:
@@ -386,6 +418,7 @@ for i in range(nrows + 1):
             mainlist[i].append(Rowheaders[j])
     else:
         mainlist[i].append(i)
+        mainlist[i].append('%.4f' % float(cf[i - 1]))
         mainlist[i].append('%.4f' % float(Df[i - 1]))
         mainlist[i].append('%.4f' % float(dH_Euler[i - 1]))
         mainlist[i].append('%.4f' % float(dH_inc[i - 1]))
@@ -407,10 +440,10 @@ dH_df_ov = np.sum(dH_df)
 dH_lk_ov = np.sum(dH_lk)
 dH_Euler_ov = np.sum(dH_Euler)
 
-dH_int = dH_inc_ov + dH_bld_ov + dH_sf_ov + dH_cl_ov + dH_vld  # Internal Loss
+dH_int = dH_bld_ov + dH_sf_ov + dH_cl_ov + dH_vld  # Internal Loss
 dH_par = dH_rc_ov + dH_df_ov + dH_lk_ov  # Exernal Loss
 dH_act = dH_Euler_ov + dH_par  # Actual Work Done
-Eff_isen = (dH_Euler_ov - dH_int) / dH_act
+Eff_isen_ov = (dH_Euler_ov - dH_int) / dH_act
 
 Rowheaders = ['Euler_Work'] + Qnt_LossParm + ['Efficiency']
 mainlist = [[] for i in range(2)]
@@ -428,9 +461,15 @@ for i in range(2):
         mainlist[i].append('%.4f' % float(dH_df_ov))
         mainlist[i].append('%.4f' % float(dH_lk_ov))
         mainlist[i].append('%.4f' % float(dH_vld))
-        mainlist[i].append('%.4f' % float(Eff_isen))
+        mainlist[i].append('%.4f' % float(Eff_isen_ov))
 print('\n' + tabulate(mainlist))
 
+phi = (m / rho[5]) / (U[5] * ((2 * r[5][0])**2))
+print("\n"+"Flow Coefficient")
+print(phi)
+print("\n"+"DeHaller Number")
+print(DH_r1)
+print(DH_s1)
 sys.stdout.close()
 
 # # Blade Loading Loss for rotor 2
