@@ -5,7 +5,8 @@ It computes:
     2. Cartesian plots of X-Gradient of Entropy vs X-direction
     3. Cp distribution at 0.5 span
     4. Individual Losses through correlations and the quantities are
-    mass averaged at the surface planes."""
+    mass averaged at the surface planes.
+    5. Domain numbers are 3, 14 and 7 respectively or  """
 
 import sys
 import math
@@ -18,7 +19,7 @@ from tabulate import tabulate
 WorkSplitR1 = 35
 dalpha = 25
 
-project_name = 'MSD_work'
+project_name = 'MSD_5sect'
 case_name = '4kgs_FR'
 file_dir = 'C:/Users/msais/Box Sync/Thesis Work/Multi-Stage_data/DiffuserConstArea/WorkSplitRotor1=' + \
     str(WorkSplitR1) + '/Stator' + str(dalpha) + 'deg/' + \
@@ -69,9 +70,9 @@ for j in Quant:
             ViewActivate(RunFile + ':1')
             RprSection(x[i][0],r[i][0],0,x[i][1],r[i][1],0,0,0,1 ,'Section '+str(i+1),0 ,'',0)
 
-ViewActivate(RunFile + ':6')
-
-
-ActivePlotCurveOutput(file_dir + j + '_1_Az_avg' + '.dat' ,'Section 1 on domain3')
-ActivePlotCurveOutput(file_dir + j + '_3_Az_avg' + '.dat' ,'Section 3 on domain14')
-ActivePlotCurveOutput(file_dir + j + '_5_Az_avg' + '.dat' ,'Section 5 on domain7')
+# ViewActivate(RunFile + ':6')
+#
+#
+# ActivePlotCurveOutput(file_dir + j + '_1_Az_avg' + '.dat' ,'Section 1 on domain3')
+# ActivePlotCurveOutput(file_dir + j + '_3_Az_avg' + '.dat' ,'Section 3 on domain14')
+# ActivePlotCurveOutput(file_dir + j + '_5_Az_avg' + '.dat' ,'Section 5 on domain7')
