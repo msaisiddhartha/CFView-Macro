@@ -15,3 +15,10 @@ script in CFView and generate values manually.
 4. Incidence Loss is considered to be included in skin friction loss term.
 5. Removed errors in calculating absolute flow angle at diffuser exit.
 6. Added macro for single-stage baseline model.
+
+10-20-2017: Changes made
+1. Changed the recirculation loss for rotors only.
+2. Leakage loss to all blade rows.
+3. No clearance loss.
+4. Removed inputs from CFD for W_tip since definition of averaging
+velocity changed for skin friction loss.

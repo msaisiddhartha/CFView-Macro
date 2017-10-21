@@ -17,8 +17,8 @@ from tabulate import tabulate
 WorkSplitR1 = 35
 dalpha = 25
 
-project_name = 'MSD_work'
-case_name = '4kgs_FR'
+project_name = 'MSD_Bckswp45'
+case_name = '4kgs_111'
 file_dir = 'C:/Users/msais/Box Sync/Thesis Work/Multi-Stage_data/DiffuserConstArea/WorkSplitRotor1=' + \
     str(WorkSplitR1) + '/Stator' + str(dalpha) + 'deg/' + \
     project_name + '/' + project_name + '_' + case_name + '/'
@@ -47,31 +47,16 @@ w = 2 * np.pi * N / 60  # Angular Velocity
 U6 = r6 * w
 phi = (m / rho) / (U6 * ((2 * r6)**2))
 
-#=======R1 = 0.35, Dalpha = 25 and work===========
-W_hub = [114.073, 1, 287.376, 1, 243.4279, 1, 1]
-W_tip = [296.548, 1, 230.909, 1, 337.775, 1, 1]
-V_tip = [5.449, 1, 213.587, 1, 122.495, 1, 1]
-Vm_m = [124.380, 1, 130.725, 1, 135.77, 1, 1]
-chord_r1 = 0.12995
+#=======R1 = 0.35, Dalpha = 25====================
+W_tip = 243.4279
+chord_r1 = 0.0534744
 chord_s1 = 0.07272
 #=================================================
 
-# #=======R1 = 0.35, Dalpha = 25====================
-# W_hub = [114.073, 1, 287.376, 1, 243.4279, 1, 1]
-# W_tip = [296.548, 1, 230.909, 1, 337.775, 1, 1]
-# V_tip = [5.449, 1, 213.587, 1, 122.495, 1, 1]
-# Vm_m = [124.380, 1, 130.725, 1, 135.77, 1, 1]
-# chord_r1 = 0.0534744
-# chord_s1 = 0.07272
-# #=================================================
-
 #=======R1 = 0.35, Dalpha = 35====================
-# W_hub = [114.073, 1, 287.376, 1, 282.053, 1, 1]
-# W_tip = [296.548, 1, 230.909, 1, 337.777, 1, 1]
-# V_tip = [5.449, 1, 213.587, 1, -88.299, 1, 1]
-# Vm_m = [124.380, 1, 130.725, 1, 131.775, 1, 1]
-# chord_r1 = 0.0534744
-# chord_s1 = 0.06635
+#W_tip = 282.053
+#chord_r1 = 0.0534744
+#chord_s1 = 0.06635
 #=================================================
 
 # ---------------------------Input for Post-processing ------------------------
@@ -86,7 +71,7 @@ WRange = [[0, 400], [0, 400]]
 
 # Losses
 Qnt_LossParm = ["Inc_Loss", "BldeLoading_Loss", "SkinFriction_Loss",
-                "Clearance_Loss", "Recir_Loss", "DiskFriction_Loss", "Leakage_Loss", "VanelessDiff_Loss"]
+                "Recir_Loss", "DiskFriction_Loss", "Leakage_Loss", "VanelessDiff_Loss"]
 
 # ------------------------------Geometry Data----------------------------------
 r = np.zeros((nsect, 2))
@@ -284,7 +269,8 @@ QntFieldScalar('Vm')
 Vm[c] = WeightedIntegral()
 
 # print('\nJ    Swirl      T0          P0      P0rel       r     Entropy')
-Rowheaders = ['J', 'Swirl', 'Vt', 'Vm', 'T0', 'P0', 'P0rel', 'alpha', 'Entropy']
+Rowheaders = ['J', 'Swirl', 'Vt', 'Vm',
+              'T0', 'P0', 'P0rel', 'alpha', 'Entropy']
 mainlist = [[] for i in range(nsect + 1)]
 for i in range(nsect + 1):
     if i == 0:
@@ -318,10 +304,10 @@ dH_Euler = np.zeros(nrows)
 dH_inc = np.zeros(nrows)
 dH_bld = np.zeros(nrows)
 dH_sf = np.zeros(nrows)
-dH_cl = np.zeros(nrows)
 dH_rc = np.zeros(nrows)
 dH_df = np.zeros(nrows)
 dH_lk = np.zeros(nrows)
+DH = np.zeros(nrows)
 
 U = w * rm
 f_inc = 0.5
@@ -332,23 +318,24 @@ for i in range(nrows):
     dH_Euler[i] = Cp * (T0[c + 1] - T0[c])
     c += 2
 
-# Diffusion Factor
+# Calculating diffusion factor
 ss_r1 = 2 * np.pi * rm[0] / Z[0]
 sol_r1 = chord_r1 / ss_r1
-DH_r1 = W[1] / W[0]
-Df[0] = 1 - DH_r1 + (Wt[1] - Wt[0]) / (2 * sol_r1 * W[0])
+DH[0] = W[1] / W[0]
+Df[0] = 1 - DH[0] + (Wt[1] - Wt[0]) / (2 * sol_r1 * W[0])  # rotor 1
 
 ss_s1 = 2 * np.pi * rm[2] / Z[1]
 sol_s1 = chord_s1 / ss_s1
-DH_s1 = V[3] / V[2]
-Df[1] = 1 - DH_s1 + (Vt[3] - Vt[2]) / (2 * sol_s1 * V[2])
+DH[1] = V[3] / V[2]
+Df[1] = 1 - DH[1] + (Vt[3] - Vt[2]) / (2 * sol_s1 * V[2])  # stator 1
 
-Wratio = W[5] / W_tip[4]
+DH[2] = W[4] / W[5]
+Wratio = W[5] / W_tip
 sol_r2 = Z[2] / np.pi
 rad_ratio = r[4][1] / (0.5 * (r[5][0] + r[5][1]))
 num = 0.75 * dH_Euler[2] / U[5]**2
 Df[2] = 1 - Wratio + (Wratio * num) / \
-    (sol_r2 * (1 - rad_ratio) + 2 * rad_ratio)
+    (sol_r2 * (1 - rad_ratio) + 2 * rad_ratio)  # rotor 2
 
 c = 0
 for i in range(nrows):
@@ -358,45 +345,41 @@ for i in range(nrows):
     elif i == 1:
         dH_inc[i] = f_inc * (U[c])
     else:
-        dH_inc[i] = f_inc * (Vt[c] - U[c] - Wt[c])**2 / 2
-    """Losses calculated assuming all loss is similar to rotor 2 loss correlations"""
+        dH_inc[i] = f_inc * (U[c] - Wt[c])**2 / 2
+
     # Blade Loading Loss
-    if i==2:
-        dH_bld[i] = 0.05 * Df[i] * U[c + 1]**2
+    dH_bld[i] = 0.05 * Df[i] * U[c + 1]**2
 
     # Skin Friction Loss
-    W_avg = (V_tip[c] + V[c + 1] + W_tip[c] + 2 * W_hub[c] + 3 * W[c + 1]) / 8
+    if i % 2 == 1:
+        W_avg = ((W[c]**2 + W[c + 1]**2) / 2)**0.5
+    else:
+        W_avg = ((V[c]**2 + V[c + 1]**2) / 2)**0.5
     dH_sf[i] = 2 * cf[i] * Lb[i] * W_avg**2 / Dh[i]
 
     # Disk Friction
     Re_df = U[c + 1] * rm[c + 1] / nu
-    f_df = 0.0622 / Re_df**0.2
+    if Re_df >= 3*10**5:
+        f_df = 0.0622 / Re_df**0.2
+    if Re_df < 3*10**5:
+        f_df = 2.67 / Re_df**0.5
     rho_avg = (rho[c] + rho[c + 1]) / 2
     dH_df[i] = f_df * (rho_avg * rm[c + 1]**2 * U[c + 1]**3) / (4 * m)
 
-
-    # Recirculation Loss
-    dH_rc[i] = abs(8e-5 * math.sinh(3.5 * alpha[c + 1]**3)
-                   * Df[i]**2 * U[c + 1]**2)
-
-    # Clearance Loss for rotor 2
-    if i == 2:
-        sold = (4 * np.pi) / (bw[c + 1] * Z[i])
-        frac = ((r[c][1]**2 - r[c][0]**2)) / \
-            ((r[c + 1][0] - r[c][1]) * (1 + rho[c + 1] / rho[c]))
-        dH_cl[i] = 0.6 * (cl[i] / bw[c + 1]) * abs(Vt[c + 1]) * \
-            (sold * frac * abs(Vt[c + 1]) * Vm_m[c])**0.5
-
-    # Leakage Loss for Rotors only
+    # Recirculation Loss for only rotors
     if i % 2 == 0:
+        dH_rc[i] = abs(8e-5 * math.sinh(3.5 * alpha[c + 1]**3)
+                       * Df[i]**2 * U[c + 1]**2)
+
+    # Leakage Loss
         b_avg = (bw[c] + bw[c + 1]) / 2
         r_avg = 0.5 * (r[c + 1][0] + 0.5 * (r[c][0] + r[c][1]))
         r1_m = 0.5 * (r[c][0] + r[c][1])
         dP_cl = m * (r[c + 1][0] * abs(Vt[c + 1]) - r_avg *
                      abs(Vt[c])) / (Z[i] * r_avg * b_avg)
-        U_cl = 0.816 * (2 * dP_cl * rho[c + 1])**0.5
+        U_cl = 0.816 * (2 * abs(dP_cl) * rho[c + 1])**0.5
         m_cl = rho[c + 1] * Z[i] * cl[i] * Lb[i] * U_cl
-        dH_lk[i] = m_cl * U_cl * U6 / (2 * m)
+        dH_lk[i] = m_cl * U_cl * U[c + 1] / (2 * m)
 
     c += 2
 
@@ -404,13 +387,14 @@ for i in range(nrows):
 dH_vld = Cp * T0[5] * ((P[6] / P0[6])**(1 / 3.5) -
                        (P[6] / P0[5])**(1 / 3.5))
 
-dH_int = dH_bld + dH_sf + dH_cl  # Internal Loss
+dH_int = dH_inc + dH_bld + dH_sf + dH_vld # Internal Loss
 dH_par = dH_rc + dH_df + dH_lk  # Exernal Loss
 dH_act = dH_Euler + dH_par  # Actual Work Done
 Eff_isen = (dH_Euler - dH_int) / dH_act
 Eff_isen[1] = 0
 
-Rowheaders = ['Row', 'Cf', 'Df', 'Euler_Work'] + Qnt_LossParm[:-1] + ['Efficiency']
+Rowheaders = ['Row', 'Cf', 'Df', 'DeHaller', 'Euler_Work'] + \
+    Qnt_LossParm[:-1] + ['Efficiency']
 mainlist = [[] for i in range(nrows + 1)]
 for i in range(nrows + 1):
     if i == 0:
@@ -420,11 +404,11 @@ for i in range(nrows + 1):
         mainlist[i].append(i)
         mainlist[i].append('%.4f' % float(cf[i - 1]))
         mainlist[i].append('%.4f' % float(Df[i - 1]))
+        mainlist[i].append('%.4f' % float(DH[i - 1]))
         mainlist[i].append('%.4f' % float(dH_Euler[i - 1]))
         mainlist[i].append('%.4f' % float(dH_inc[i - 1]))
         mainlist[i].append('%.4f' % float(dH_bld[i - 1]))
         mainlist[i].append('%.4f' % float(dH_sf[i - 1]))
-        mainlist[i].append('%.4f' % float(dH_cl[i - 1]))
         mainlist[i].append('%.4f' % float(dH_rc[i - 1]))
         mainlist[i].append('%.4f' % float(dH_df[i - 1]))
         mainlist[i].append('%.4f' % float(dH_lk[i - 1]))
@@ -434,13 +418,12 @@ print('\n' + tabulate(mainlist))
 dH_inc_ov = np.sum(dH_inc)
 dH_bld_ov = np.sum(dH_bld)
 dH_sf_ov = np.sum(dH_sf)
-dH_cl_ov = np.sum(dH_cl)
 dH_rc_ov = np.sum(dH_rc)
 dH_df_ov = np.sum(dH_df)
 dH_lk_ov = np.sum(dH_lk)
 dH_Euler_ov = np.sum(dH_Euler)
 
-dH_int = dH_bld_ov + dH_sf_ov + dH_cl_ov + dH_vld  # Internal Loss
+dH_int = dH_inc_ov + dH_bld_ov + dH_sf_ov +  dH_vld  # Internal Loss
 dH_par = dH_rc_ov + dH_df_ov + dH_lk_ov  # Exernal Loss
 dH_act = dH_Euler_ov + dH_par  # Actual Work Done
 Eff_isen_ov = (dH_Euler_ov - dH_int) / dH_act
@@ -456,7 +439,6 @@ for i in range(2):
         mainlist[i].append('%.4f' % float(dH_inc_ov))
         mainlist[i].append('%.4f' % float(dH_bld_ov))
         mainlist[i].append('%.4f' % float(dH_sf_ov))
-        mainlist[i].append('%.4f' % float(dH_cl_ov))
         mainlist[i].append('%.4f' % float(dH_rc_ov))
         mainlist[i].append('%.4f' % float(dH_df_ov))
         mainlist[i].append('%.4f' % float(dH_lk_ov))
@@ -465,48 +447,6 @@ for i in range(2):
 print('\n' + tabulate(mainlist))
 
 phi = (m / rho[5]) / (U[5] * ((2 * r[5][0])**2))
-print("\n"+"Flow Coefficient")
+print("\n" + "Flow Coefficient")
 print(phi)
-print("\n"+"DeHaller Number")
-print(DH_r1)
-print(DH_s1)
 sys.stdout.close()
-
-# # Blade Loading Loss for rotor 2
-# dH_bld[2] = 0.05 * Df[2] * U6**2
-#
-# # Skin Friction Loss for rotor 2
-# W_avg = (V_tip[4] + V[5] + W_tip[4] + 2 * W_hub[4] + 3 * W[5]) / 8
-# dH_sf[2] = 2 * cf[2] * Lb[2] * W_avg**2 / Dh[2]
-#
-#
-# # Clearance Loss for rotor 2
-# sold = (4 * np.pi) / (bw[5] * Z[2])
-# frac = ((r[4][1]**2 - r[4][0]**2)) / \
-#     ((r[5][0] - r[4][1]) * (1 + rho[5] / rho[4]))
-# dH_cl[2] = 0.6 * (cl[2] / bw[5]) * abs(Vt[5]) * \
-#     (sold * frac * abs(Vt[5]) * Vm_m[4])**0.5
-#
-# # Vaneless diffuser loss
-# dH_vld[2] = Cp * T0[5] * ((P[6] / P0[6])**(1 / 3.5) -
-#                           (P[6] / P0[5])**(1 / 3.5))
-#
-#
-# # Disk Friction only for rotor 2
-# Re_df = U6 * r6 / nu
-# f_df = 0.0622 / Re_df**0.2
-# rho_avg = (rho[4] + rho[5]) / 2
-# dH_df[2] = f_df * (rho_avg * r6**2 * U6**3) / (4 * m)
-#
-# # Recirculation Loss for Rotor 2
-# dH_rc[2] = abs(8e-5 * math.sinh(3.5 * alpha[5]**3) * Df[2]**2 * U6**2)
-#
-# # Leakage Loss for Rotor 2
-# b_avg = (bw[4] + bw[5]) / 2
-# r_avg = 0.5 * (r[5][0] + 0.5 * (r[4][0] + r[4][1]))
-# r1_m = 0.5 * (r[4][0] + r[4][1])
-# dP_cl = m * (r[5][0] * abs(Vt[5]) - r_avg *
-#              abs(Vt[4])) / (Z[2] * r_avg * b_avg)
-# U_cl = 0.816 * (2 * dP_cl * rho[5])**0.5
-# m_cl = rho[5] * Z[2] * cl[2] * Lb[2] * U_cl
-# dH_lk[2] = m_cl * U_cl * U6 / (2 * m)
