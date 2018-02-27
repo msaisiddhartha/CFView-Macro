@@ -2,7 +2,10 @@ CFViewBackward(912)
 """This macro provides CFView post-processing for multi-stage compressor.
 It computes:
     1. Contour Plots at different spanwise sections
- """
+    2. Cartesian plots of X-Gradient of Entropy vs X-direction
+    3. Cp distribution at 0.5 span
+    4. Individual Losses through correlations and the quantities are
+    mass averaged at the surface planes."""
 
 import sys
 import math
@@ -11,23 +14,16 @@ import pylab as py
 from tabulate import tabulate
 
 # Case Data
-# Case Data
-WorkSplitR1 = 35
-dalpha = 25
-
-project_name = 'MSD_5sect'
-case_name = '4kgs_FR'
-file_dir = 'C:/Users/msais/Box Sync/Thesis Work/Multi-Stage_data/DiffuserConstArea/WorkSplitRotor1=' + \
-    str(WorkSplitR1) + '/Stator' + str(dalpha) + 'deg/' + \
-    project_name + '/' + project_name + '_' + case_name + '/'
+project_name = 'baseline2'
+case_name = '4kgs_SA'
+file_dir = 'C:/Users/msais/Box Sync/Thesis Work/Baseline/' + project_name + '/' + project_name + '_' + case_name + '/'
 RunFile = str(project_name + '_' + case_name + '.me.cfv')
 
 # OutFile = "Scalar Data_Azimuthal averaged.txt"
 
-Quant = ['Magnitude of V', 'Magnitude of W', 'Vm', 'Vt',
-         'Wt', 'Relative Mach Number', 'Absolute Mach Number']
+Quant = ['Magnitude of V', 'Magnitude of W', 'Vm', 'Vt', 'Wt']
 
-nsect = 7
+nsect =7
 # ------------------------------Geometry Data----------------------------------
 r = np.zeros((nsect, 2))
 x = np.zeros((nsect, 2))
@@ -57,20 +53,15 @@ for i in range(nsect - 2):
 
 FileOpenProject(file_dir + RunFile,)
 
-dm = [3, 14, 7]
 Viewnum = 2
-c = 0
 for j in Quant:
     QntFieldScalar(j)
     for i in range(nsect):
-        if i % 2 == 0:
-            ViewActivate(RunFile + ':1')
-            RprSection(x[i][0], r[i][0], 0, x[i][1], r[i][1], 0,
-                       0, 0, 1, 'Section ' + str(i + 1), 0, '', 0)
-
-# ViewActivate(RunFile + ':6')
-#
-#
-# ActivePlotCurveOutput(file_dir + j + '_1_Az_avg' + '.dat' ,'Section 1 on domain3')
-# ActivePlotCurveOutput(file_dir + j + '_3_Az_avg' + '.dat' ,'Section 3 on domain14')
-# ActivePlotCurveOutput(file_dir + j + '_5_Az_avg' + '.dat' ,'Section 5 on domain7')
+        if i%2==0:
+            RprSection(x[i][0],r[i][0],0,x[i][1],r[i][1],0,0,0,1 ,'Section '+str(i+1),0 ,'',0)
+            PlotNormalizedArcLen()
+    ViewActivate(RunFile + ':' + str(Viewnum))
+    SelectPlotCurves('Section 1 on domain3')
+    ActivePlotCurveOutput(file_dir + 'Az_avg' + '.dat' ,'Section 1 on domain3')
+    ViewActivate(RunFile + ':1')
+    Viewnum += 1

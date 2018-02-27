@@ -22,3 +22,9 @@ script in CFView and generate values manually.
 3. No clearance loss.
 4. Removed inputs from CFD for W_tip since definition of averaging
 velocity changed for skin friction loss.
+
+
+02-27-2017: Changes made
+1. Corrected the skin friction loss formula
+2. Added clearance loss to all blade rows
+3. Included more parameters in azimuthal macro
