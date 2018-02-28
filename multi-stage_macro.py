@@ -1,4 +1,4 @@
-CFViewBackward(912)
+CFViewBackward(1210)
 """This macro provides CFView post-processing for 1.5-stage centrifugal compressor.
 It computes:
     1. Contour Plots at different spanwise sections
@@ -373,20 +373,19 @@ for i in range(nrows):
     dH_cl[i] = 0.6 * (cl[i] / bw[c + 1]) * abs(Vt[c + 1]) * \
         (sold[i] * abs(frac * Vt[c + 1]) * Vm[c])**0.5
 
-    # Recirculation Loss for only rotors
-    if i % 2 == 0:
-        dH_rc[i] = abs(8e-5 * math.sinh(3.5 * alpha[c + 1]**3)
-                       * Df[i]**2 * U[c + 1]**2)
+    # Recirculation Loss
+    dH_rc[i] = abs(8e-5 * math.sinh(3.5 * alpha[c + 1]**3)
+                   * Df[i]**2 * U[c + 1]**2)
 
-    # Leakage Loss for Rotors only
-        b_avg = (bw[c] + bw[c + 1]) / 2
-        r_avg = 0.5 * (r[c + 1][0] + 0.5 * (r[c][0] + r[c][1]))
-        r1_m = 0.5 * (r[c][0] + r[c][1])
-        dP_cl = m * (r[c + 1][0] * abs(Vt[c + 1]) - r_avg *
-                     abs(Vt[c])) / (Z[i] * r_avg * b_avg)
-        U_cl = 0.816 * (2 * abs(dP_cl) * rho[c + 1])**0.5
-        m_cl = rho[c + 1] * Z[i] * cl[i] * Lb[i] * U_cl
-        dH_lk[i] = m_cl * U_cl * U[c + 1] / (2 * m)
+    # Leakage Loss
+    b_avg = (bw[c] + bw[c + 1]) / 2
+    r_avg = 0.5 * (r[c + 1][0] + 0.5 * (r[c][0] + r[c][1]))
+    r1_m = 0.5 * (r[c][0] + r[c][1])
+    dP_cl = m * (r[c + 1][0] * abs(Vt[c + 1]) - r_avg *
+                 abs(Vt[c])) / (Z[i] * r_avg * b_avg)
+    U_cl = 0.816 * (2 * abs(dP_cl) * rho[c + 1])**0.5
+    m_cl = rho[c + 1] * Z[i] * cl[i] * Lb[i] * U_cl
+    dH_lk[i] = m_cl * U_cl * U[c + 1] / (2 * m)
 
     c += 2
 
