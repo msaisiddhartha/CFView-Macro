@@ -315,7 +315,7 @@ sol_s1 = chord_s1 / ss_s1
 DH[1] = V[3] / V[2]
 Df[1] = 1 - DH[1] + (Vt[3] - Vt[2]) / (2 * sol_s1 * V[2])  # stator 1
 
-DH[2] = W[4] / W[5]
+DH[2] = W[5] / W[4]
 Wratio = W[5] / W_tip
 sol_r2 = Z[2] / np.pi
 
@@ -325,10 +325,11 @@ num = 0.75 * dH_Euler[2] / U[5]**2
 Df[2] = 1 - Wratio + (Wratio * num) / \
     (sol_r2 * (1 - rad_ratio) + 2 * rad_ratio)  # rotor 2
 c = 0
-
+Rx[0] = (P[1] - P[0]) / (P[3] - P[0])
+Rx[2] = (P[5] - P[4]) / (P[6] - P[4])
 for i in range(nrows):
     # Degree of Reaction
-    Rx[i] = (T[c + 1] - T[c]) / (T[c + 2] - T[c])
+    #Rx[i] = (T[c + 1] - T[c]) / (T[c + 2] - T[c])
 
     # Incidence Loss
     if i == 0:
@@ -393,7 +394,7 @@ for i in range(nrows):
 dH_vld = Cp * T0[5] * ((P[6] / P0[6])**(1 / 3.5) -
                        (P[6] / P0[5])**(1 / 3.5))
 
-dH_int = dH_inc + dH_bld + dH_sf + dH_cl + dH_vld  # Internal Loss
+dH_int = dH_inc + dH_bld + dH_sf + dH_cl  # Internal Loss
 dH_par = dH_rc + dH_df + dH_lk  # Exernal Loss
 dH_act = dH_Euler + dH_par  # Actual Work Done
 Eff_isen = (dH_Euler - dH_int) / dH_act
@@ -467,7 +468,7 @@ dH_int = dH_inc_ov + dH_bld_ov + dH_sf_ov + dH_vld  # Internal Loss
 dH_par = dH_cl_ov + dH_rc_ov + dH_df_ov + dH_lk_ov  # Exernal Loss
 dH_act = dH_Euler_ov + dH_par  # Actual Work Done
 Eff_isen_ov = (dH_Euler_ov - dH_int) / dH_act
-Rx_ov = (T[-2] - T[0]) / (T[-1] - T[0])
+Rx_ov = (P[-2] - P[0]) / (P[-1] - P[0])
 Rowheaders = ['Rx', 'Euler_Work'] + Qnt_LossParm + ['Efficiency']
 mainlist = [[] for i in range(2)]
 for i in range(2):
@@ -491,6 +492,4 @@ print('\n' + tabulate(mainlist))
 phi = (m / rho[5]) / (U[5] * ((2 * r[5][0])**2))
 print("\n" + "Flow Coefficient")
 print(phi)
-print(L, dhyd, W_avg, p, bi, denom)
-print(sold)
 sys.stdout.close()
