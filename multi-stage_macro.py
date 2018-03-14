@@ -47,7 +47,6 @@ Pref = 101325  # Pressure
 
 w = 2 * np.pi * N / 60  # Angular Velocity
 U6 = r6 * w
-phi = (m / rho) / (U6 * ((2 * r6)**2))
 
 #=======R1 = 0.35, Dalpha = 25====================
 Wt_ac = [-184.6286, 47.2197, -207.3489, -155.4158]
@@ -69,13 +68,15 @@ nrows = 3  # Number of blade rows
 nsect = 7  # Number of planes to create
 
 # 3D-View Contour Plot
+Qnt = ['Entropy', 'Magnitude of W', 'Relative Mach Number']
 span = [0.5, 0.95]
 EntropyRange = [[-10, 120], [-10, 170]]
 WRange = [[0, 400], [0, 400]]
+RMach = [[0, 1], [0, 1], [0, 1]]
 
 # Losses
-Qnt_LossParm = ["Inc_Loss", "BldeLoading_Loss", "SkinFriction_Loss", "Clearance_Loss",
-                "Recir_Loss", "DiskFriction_Loss", "Leakage_Loss", "VanelessDiff_Loss"]
+Qnt_LossParm = ["Incidence_Loss", "BldeLoading_Loss", "SkinFriction_Loss",
+                "Clearance_Loss", "Recir_Loss", "DiskFriction_Loss", "Leakage_Loss", "VanelessDiff_Loss"]
 
 # ------------------------------Geometry Data----------------------------------
 r = np.zeros((nsect, 2))
@@ -133,54 +134,40 @@ SetCamera(scm[0], scm[1], scm[2], scm[3], scm[4], scm[5],
 GmtToggleBoundary()
 
 
-for i in range(len(span)):
-    SelectFromProject('CUT' + str(i + 1),)
+for j in range(len(Qnt)):
+    for i in range(len(span)):
+        SelectFromProject('CUT' + str(i + 1),)
 
-    # Entropy
-    QntFieldScalar('Entropy',)
-    SclContourStrip()
-    ColormapStripesOnly()
-    ColormapNumOfSmallTicks(3)
-    ColormapTicksNumberTextType(10, 12, 2, 0, 1, 0, 0, 1, 0, 0, 0, 0)
-    ColormapLabelTextType(10, 12, 2, 2, 1, 0, 0, 1, 0, 0, 0, 0)
-    RprRangeIn(EntropyRange[i][0], EntropyRange[i][1])
-    SetCamera(0.261069, -0.0804571, 0.0386409, 0.158219, -0.0247637,
-              0.0239268, -0.474188, -0.880254, -0.0172853, 0.0471529, 0.0703255)
-    Print(8, 0, 0, 1, 100, 1317, 704, 0, file_dir + 'EntropyB2b' +
-          str(span[i]) + 'R1_' + str(WorkSplitR1) + '_' + str(dalpha) + '.png', '', 1, 1, 1)
-    SetCamera(0.214698, -0.0509236, 0.00635897, 0.16529, -0.00694214,
-              0.0328556, -0.26149, -0.69639, 0.66833, 0.0285029, 0.0425103)
-    Print(8, 0, 0, 1, 100, 1920, 1080, 0, file_dir + 'EntropyB2b' +
-          str(span[i]) + 'S1_' + str(WorkSplitR1) + '_' + str(dalpha) + '.png', '', 1, 1, 1)
-    SetCamera(0.360388, 0.0561327, -0.0619866, 0.215378, 0.0653739,
-              0.0752378, 0.285215, -0.887805, 0.361185, 0.0799439, 0.119231)
-    Print(8, 0, 0, 1, 100, 1701, 873, 0, file_dir + 'EntropyB2b' +
-          str(span[i]) + 'R2_' + str(WorkSplitR1) + '_' + str(dalpha) + '.png', '', 1, 1, 1)
-
-    # Relative Velocity
-    QntFieldScalar('Magnitude of W',)
-    SclContourStrip()
-    ColormapStripesOnly()
-    ColormapLabelTextType(10, 12, 2, 2, 1, 0, 0, 1, 0, 0, 0, 0)
-    SclContourStrip()
-    RprRangeIn(WRange[i][0], WRange[i][1])
-    SetCamera(0.261069, -0.0804571, 0.0386409, 0.158219, -0.0247637,
-              0.0239268, -0.474188, -0.880254, -0.0172853, 0.0471529, 0.0703255)
-    Print(8, 0, 0, 1, 100, 1317, 704, 0, file_dir + 'RelVelB2b' +
-          str(span[i]) + 'R1_' + str(WorkSplitR1) + '_' + str(dalpha) + '.png', '', 1, 1, 1)
-    SetCamera(0.214698, -0.0509236, 0.00635897, 0.16529, -0.00694214,
-              0.0328556, -0.26149, -0.69639, 0.66833, 0.0285029, 0.0425103)
-    Print(8, 0, 0, 1, 100, 1920, 1080, 0, file_dir + 'RelVelB2b' +
-          str(span[i]) + 'S1_' + str(WorkSplitR1) + '_' + str(dalpha) + '.png', '', 1, 1, 1)
-    SetCamera(0.360388, 0.0561327, -0.0619866, 0.215378, 0.0653739,
-              0.0752378, 0.285215, -0.887805, 0.361185, 0.0799439, 0.119231)
-    Print(8, 0, 0, 1, 100, 1701, 873, 0, file_dir + 'RelVelB2b' +
-          str(span[i]) + 'R2_' + str(WorkSplitR1) + '_' + str(dalpha) + '.png', '', 1, 1, 1)
-    DeleteAll()
+        # Entropy
+        QntFieldScalar(Qnt[j],)
+        SclContourStrip()
+        ColormapStripesOnly()
+        ColormapNumOfSmallTicks(3)
+        ColormapTicksNumberTextType(10, 12, 2, 0, 1, 0, 0, 1, 0, 0, 0, 0)
+        ColormapLabelTextType(10, 12, 2, 2, 1, 0, 0, 1, 0, 0, 0, 0)
+        if j == 0:
+            RprRangeIn(EntropyRange[i][0], EntropyRange[i][1])
+        if j == 1:
+			RprRangeIn(WRange[i][0], WRange[i][1])
+        if j == 2:
+			RprRangeIn(RMach[i][0], RMach[i][1])
+        SetCamera(0.261069, -0.0804571, 0.0386409, 0.158219, -0.0247637,
+                  0.0239268, -0.474188, -0.880254, -0.0172853, 0.0471529, 0.0703255)
+        Print(8, 0, 0, 1, 100, 1317, 704, 0, file_dir + Qnt[j] + '_B2b_' +
+              str(span[i]) + '_R1_' + str(WorkSplitR1) + '_' + str(dalpha) + '.png', '', 1, 1, 1)
+        SetCamera(0.214698, -0.0509236, 0.00635897, 0.16529, -0.00694214,
+                  0.0328556, -0.26149, -0.69639, 0.66833, 0.0285029, 0.0425103)
+        Print(8, 0, 0, 1, 100, 1920, 1080, 0, file_dir + Qnt[j] + '_B2b_' +
+              str(span[i]) + '_S1_' + str(WorkSplitR1) + '_' + str(dalpha) + '.png', '', 1, 1, 1)
+        SetCamera(0.360388, 0.0561327, -0.0619866, 0.215378, 0.0653739,
+                  0.0752378, 0.285215, -0.887805, 0.361185, 0.0799439, 0.119231)
+        Print(8, 0, 0, 1, 100, 1701, 873, 0, file_dir + Qnt[j] + '_B2b_' +
+              str(span[i]) + '_R2_' + str(WorkSplitR1) + '_' + str(dalpha) + '.png', '', 1, 1, 1)
+        DeleteAll()
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # ==============================================================================
-# Cylindrical view - Calculating Loss and Exporting to File(Surface Area Average Values)
+# Cylindrical view - Exporting to File(Surface Area Average Values)
 # ==============================================================================
 ViewActivate(RunFile + ':1')
 
@@ -200,6 +187,7 @@ V = np.zeros(nsect)
 Wt = np.zeros(nsect)
 alpha = np.zeros(nsect)
 beta = np.zeros(nsect)
+Wui = np.zeros(nsect)
 Vm = np.zeros(nsect)
 M = np.zeros(nsect)
 Mrel = np.zeros(nsect)
@@ -255,6 +243,8 @@ for c in range(nsect):
     alpha[c] = WeightedIntegral()
     QntFieldScalar('atan(Wt/Wm)')
     beta[c] = WeightedIntegral()
+    QntFieldScalar('Wui')
+    Wui[c] = WeightedIntegral()
     QntFieldScalar('Vm')
     Vm[c] = WeightedIntegral()
     QntFieldScalar('Absolute Mach Number')
@@ -280,9 +270,8 @@ for i in range(nrows):
         SelectFromProject('row ' + str(i + 1) + '_blade')
     cf[i] = SclAverage()
 
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # ---------------------Calculating Individual Losses---------------------------
-
-
 loss = np.zeros((len(Qnt_LossParm), nrows))
 Df = np.zeros(nrows)
 dH_Euler = np.zeros(nrows)
@@ -296,6 +285,8 @@ dH_lk = np.zeros(nrows)
 DH = np.zeros(nrows)
 Rx = np.zeros(nrows)
 U = w * rm
+r_inc = np.linspace(r[0][0], r[0][1], 10)
+U_inc = np.average(w * r_inc)
 f_inc = 0.5
 
 c = 0
@@ -328,9 +319,6 @@ c = 0
 Rx[0] = (P[1] - P[0]) / (P[3] - P[0])
 Rx[2] = (P[5] - P[4]) / (P[6] - P[4])
 for i in range(nrows):
-    # Degree of Reaction
-    #Rx[i] = (T[c + 1] - T[c]) / (T[c + 2] - T[c])
-
     # Incidence Loss
     if i == 0:
         dH_inc[i] = f_inc * (Wt_ac[i] + Wt[c])**2 / 2
@@ -398,7 +386,7 @@ dH_int = dH_inc + dH_bld + dH_sf + dH_cl  # Internal Loss
 dH_par = dH_rc + dH_df + dH_lk  # Exernal Loss
 dH_act = dH_Euler + dH_par  # Actual Work Done
 Eff_isen = (dH_Euler - dH_int) / dH_act
-Eff_isen[1] = 0
+Eff_isen[1] = 0     #For stator row efficiency is set 0
 
 # ==============================================================================
 # Exporting data to file

@@ -59,9 +59,11 @@ nrows = 1  # Number of blade rows
 nsect = 7  # Number of planes to create
 
 # 3D-View Contour Plot
-span = [0.5, 0.9]
+Qnt = ['Entropy', 'Magnitude of W', 'Relative Mach Number']
+span = [0.5, 0.95]
 EntropyRange = [[-10, 120], [-10, 170]]
 WRange = [[0, 400], [0, 400]]
+RMach = [[0, 1], [0, 1], [0, 1]]
 
 # Losses
 Qnt_LossParm = ["Incidence_Loss", "BldeLoading_Loss", "SkinFriction_Loss",
@@ -123,54 +125,40 @@ SetCamera(scm[0], scm[1], scm[2], scm[3], scm[4], scm[5],
 GmtToggleBoundary()
 
 
-for i in range(len(span)):
-    SelectFromProject('CUT' + str(i + 1),)
+for j in range(len(Qnt)):
+    for i in range(len(span)):
+        SelectFromProject('CUT' + str(i + 1),)
 
-    # Entropy
-    QntFieldScalar('Entropy',)
-    SclContourStrip()
-    ColormapStripesOnly()
-    ColormapNumOfSmallTicks(3)
-    ColormapTicksNumberTextType(10, 12, 2, 0, 1, 0, 0, 1, 0, 0, 0, 0)
-    ColormapLabelTextType(10, 12, 2, 2, 1, 0, 0, 1, 0, 0, 0, 0)
-    RprRangeIn(EntropyRange[i][0], EntropyRange[i][1])
-    SetCamera(0.261069, -0.0804571, 0.0386409, 0.158219, -0.0247637,
-              0.0239268, -0.474188, -0.880254, -0.0172853, 0.0471529, 0.0703255)
-    Print(8, 0, 0, 1, 100, 1317, 704, 0, file_dir + 'EntropyB2b' +
-          str(span[i]) + 'R1' + '.png', '', 1, 1, 1)
-    SetCamera(0.214698, -0.0509236, 0.00635897, 0.16529, -0.00694214,
-              0.0328556, -0.26149, -0.69639, 0.66833, 0.0285029, 0.0425103)
-    Print(8, 0, 0, 1, 100, 1920, 1080, 0, file_dir + 'EntropyB2b' +
-          str(span[i]) + 'S1' + '.png', '', 1, 1, 1)
-    SetCamera(0.360388, 0.0561327, -0.0619866, 0.215378, 0.0653739,
-              0.0752378, 0.285215, -0.887805, 0.361185, 0.0799439, 0.119231)
-    Print(8, 0, 0, 1, 100, 1701, 873, 0, file_dir + 'EntropyB2b' +
-          str(span[i]) + 'R2' + '.png', '', 1, 1, 1)
-
-    # Relative Velocity
-    QntFieldScalar('Magnitude of W',)
-    SclContourStrip()
-    ColormapStripesOnly()
-    ColormapLabelTextType(10, 12, 2, 2, 1, 0, 0, 1, 0, 0, 0, 0)
-    SclContourStrip()
-    RprRangeIn(WRange[i][0], WRange[i][1])
-    SetCamera(0.261069, -0.0804571, 0.0386409, 0.158219, -0.0247637,
-              0.0239268, -0.474188, -0.880254, -0.0172853, 0.0471529, 0.0703255)
-    Print(8, 0, 0, 1, 100, 1317, 704, 0, file_dir + 'RelVelB2b' +
-          str(span[i]) + 'R1' + '.png', '', 1, 1, 1)
-    SetCamera(0.214698, -0.0509236, 0.00635897, 0.16529, -0.00694214,
-              0.0328556, -0.26149, -0.69639, 0.66833, 0.0285029, 0.0425103)
-    Print(8, 0, 0, 1, 100, 1920, 1080, 0, file_dir + 'RelVelB2b' +
-          str(span[i]) + 'S1' + '.png', '', 1, 1, 1)
-    SetCamera(0.360388, 0.0561327, -0.0619866, 0.215378, 0.0653739,
-              0.0752378, 0.285215, -0.887805, 0.361185, 0.0799439, 0.119231)
-    Print(8, 0, 0, 1, 100, 1701, 873, 0, file_dir + 'RelVelB2b' +
-          str(span[i]) + 'R2' + '.png', '', 1, 1, 1)
-    DeleteAll()
+        # Entropy
+        QntFieldScalar(Qnt[j],)
+        SclContourStrip()
+        ColormapStripesOnly()
+        ColormapNumOfSmallTicks(3)
+        ColormapTicksNumberTextType(10, 12, 2, 0, 1, 0, 0, 1, 0, 0, 0, 0)
+        ColormapLabelTextType(10, 12, 2, 2, 1, 0, 0, 1, 0, 0, 0, 0)
+        if j == 0:
+            RprRangeIn(EntropyRange[i][0], EntropyRange[i][1])
+        if j == 1:
+			RprRangeIn(WRange[i][0], WRange[i][1])
+        if j == 2:
+			RprRangeIn(RMach[i][0], RMach[i][1])
+        SetCamera(0.261069, -0.0804571, 0.0386409, 0.158219, -0.0247637,
+                  0.0239268, -0.474188, -0.880254, -0.0172853, 0.0471529, 0.0703255)
+        Print(8, 0, 0, 1, 100, 1317, 704, 0, file_dir + Qnt[j] + '_B2b_' +
+              str(span[i]) + '_R1_' + '.png', '', 1, 1, 1)
+        SetCamera(0.214698, -0.0509236, 0.00635897, 0.16529, -0.00694214,
+                  0.0328556, -0.26149, -0.69639, 0.66833, 0.0285029, 0.0425103)
+        Print(8, 0, 0, 1, 100, 1920, 1080, 0, file_dir + Qnt[j] + '_B2b_' +
+              str(span[i]) + '_S1_' + '.png', '', 1, 1, 1)
+        SetCamera(0.360388, 0.0561327, -0.0619866, 0.215378, 0.0653739,
+                  0.0752378, 0.285215, -0.887805, 0.361185, 0.0799439, 0.119231)
+        Print(8, 0, 0, 1, 100, 1701, 873, 0, file_dir + Qnt[j] + '_B2b_' +
+              str(span[i]) + '_R2_' '.png', '', 1, 1, 1)
+        DeleteAll()
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # ==============================================================================
-# Cylindrical view - Calculating Loss and Exporting to File(Surface Area Average Values)
+# Cylindrical view - Exporting to File(Surface Area Average Values)
 # ==============================================================================
 ViewActivate(RunFile + ':1')
 
@@ -201,7 +189,8 @@ cf = np.zeros(nrows)  # Skin Friction
 ViewOpenRTZ(-0.783962, -0.683962, 0.508295, 0.608295)
 QntFieldDerived(0, 'swirl', 'sqrt((x*x)+(y*y))*Vt', '', '0')
 QntFieldDerived(0, 'r', 'sqrt((x*x)+(y*y))', '', '0')
-QntFieldDerived(0, 'Wui', 'r*2340 - Wt', '', '0')
+QntFieldDerived(0, 'Wui', 'Vt - r*2340 - Wt', '', '0')
+QntFieldDerived(0, 'Vui', 'Wt + r*2340 - Vt', '', '0')
 LimitsFull()
 ViewOriginal(1,)
 CutPlaneSave(0.11, 0, 0, 0, 0, 1, 1)  # Rotor 1 Inlet
@@ -259,9 +248,7 @@ for c in range(nsect):
 # ==============================================================================
 # Cartesian view - Calculating Loss and Exporting to File(Surface Area Average Values)
 # ==============================================================================
-SelectFromProject('row 1_blade_(r.p.m. 22363)',)
-SclAverage()
-ViewOpen(-0.645817, -0.545817, 0.390775, 0.490775)
+ViewOpen(-0.504382, -0.404382, 0.154613, 0.254613)
 LimitsFull()
 
 
@@ -286,7 +273,8 @@ dH_cl = np.zeros(nrows)
 dH_rc = np.zeros(nrows)
 dH_df = np.zeros(nrows)
 dH_lk = np.zeros(nrows)
-
+DH = np.zeros(nrows)
+Rx = np.zeros(nrows)
 U = w * rm
 r_inc = np.linspace(r[0][0], r[0][1], 10)
 U_inc = np.average(w * r_inc)
@@ -300,6 +288,7 @@ for i in range(nrows):
 
 # Diffusion Factor
 
+DH[0] = W[-2] / W[0]
 Wratio = W[5] / W_tip[0]
 sol_r2 = Z[0] / np.pi
 rad_ratio = r[0][1] / (0.5 * (r[5][0] + r[5][1]))
@@ -308,6 +297,7 @@ Df[0] = 1 - Wratio + (Wratio * num) / \
     (sol_r2 * (1 - rad_ratio) + 2 * rad_ratio)
 
 c = 0
+Rx[0] = (P[-2] - P[0])/(P[-1] - P[0])
 for i in range(nrows):
     # Incidence Loss
     dH_inc[i] = f_inc * (Wt_ac[i] + Wt[c])**2 / 2
@@ -371,8 +361,10 @@ Eff_isen = (dH_Euler - dH_int) / dH_act
 # ==============================================================================
 # Exporting data to file
 # ==============================================================================
+
 sys.stdout = open(file_dir + LossFile, "w")
-Rowheaders = ['J', 'Swirl', 'Vt', 'Vm', 'T', 'P', 'M', 'Mrel',
+
+Rowheaders = ['J', 'r', 'Swirl', 'Vt', 'Vm', 'T', 'P', 'M', 'Mrel',
               'T0', 'P0', 'P0rel', 'alpha_m', 'beta_m', 'Entropy']
 mainlist = [[] for i in range(nsect + 1)]
 for i in range(nsect + 1):
@@ -381,6 +373,7 @@ for i in range(nsect + 1):
             mainlist[i].append(Rowheaders[j])
     else:
         mainlist[i].append(i)
+        mainlist[i].append('%.4f' % float(rm[i - 1]))
         mainlist[i].append('%.4f' % float(sw[i - 1]))
         mainlist[i].append('%.4f' % float(Vt[i - 1]))
         mainlist[i].append('%.4f' % float(Vm[i - 1]))
@@ -396,7 +389,8 @@ for i in range(nsect + 1):
         mainlist[i].append('%.4f' % float(s[i - 1]))
 print('\n' + tabulate(mainlist) + '\n')
 
-Rowheaders = ['Row', 'Cf', 'Df', 'Euler_Work'] + Qnt_LossParm + ['Efficiency']
+Rowheaders = ['Row', 'Cf', 'Df', 'Rx', 'DeHaller', 'Euler_Work'] + \
+    Qnt_LossParm + ['Efficiency']
 mainlist = [[] for i in range(nrows + 1)]
 for i in range(nrows + 1):
     if i == 0:
@@ -406,6 +400,8 @@ for i in range(nrows + 1):
         mainlist[i].append(i)
         mainlist[i].append('%.4f' % float(cf[i - 1]))
         mainlist[i].append('%.4f' % float(Df[i - 1]))
+        mainlist[i].append('%.4f' % float(Rx[i - 1]))
+        mainlist[i].append('%.4f' % float(DH[i - 1]))
         mainlist[i].append('%.4f' % float(dH_Euler[i - 1]))
         mainlist[i].append('%.4f' % float(dH_inc[i - 1]))
         mainlist[i].append('%.4f' % float(dH_bld[i - 1]))
@@ -421,5 +417,4 @@ print('\n' + tabulate(mainlist))
 phi = (m / rho[5]) / (U[5] * ((2 * r[5][0])**2))
 print("\n" + "Flow Coefficient")
 print(phi)
-print(L, dhyd, W_avg, p, bi, denom)
 sys.stdout.close()
