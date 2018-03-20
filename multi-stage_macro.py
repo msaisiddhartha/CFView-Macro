@@ -68,11 +68,12 @@ nrows = 3  # Number of blade rows
 nsect = 7  # Number of planes to create
 
 # 3D-View Contour Plot
-Qnt = ['Entropy', 'Magnitude of W', 'Relative Mach Number']
-span = [0.5, 0.95]
-EntropyRange = [[-10, 120], [-10, 170]]
-WRange = [[0, 400], [0, 400]]
-RMach = [[0, 1], [0, 1], [0, 1]]
+Qnt = ['Entropy', 'Magnitude of W', 'Relative Mach Number',
+       'Absolute Mach Number', 'Density']
+span = [0.25, 0.5, 0.75, 0.9, 0.95]
+EntropyRange = [[-10, 120],[-10, 120],[-10, 120],[-10, 120], [-10, 170]]
+WRange = [[0, 400],[0, 400],[0, 400],[0, 400], [0, 400]]
+RMach = [[0, 1],[0, 1],[0, 1],[0, 1], [0, 1], [0, 1]]
 
 # Losses
 Qnt_LossParm = ["Incidence_Loss", "BldeLoading_Loss", "SkinFriction_Loss",
@@ -148,9 +149,9 @@ for j in range(len(Qnt)):
         if j == 0:
             RprRangeIn(EntropyRange[i][0], EntropyRange[i][1])
         if j == 1:
-			RprRangeIn(WRange[i][0], WRange[i][1])
+            RprRangeIn(WRange[i][0], WRange[i][1])
         if j == 2:
-			RprRangeIn(RMach[i][0], RMach[i][1])
+            RprRangeIn(RMach[i][0], RMach[i][1])
         SetCamera(0.261069, -0.0804571, 0.0386409, 0.158219, -0.0247637,
                   0.0239268, -0.474188, -0.880254, -0.0172853, 0.0471529, 0.0703255)
         Print(8, 0, 0, 1, 100, 1317, 704, 0, file_dir + Qnt[j] + '_B2b_' +
@@ -211,9 +212,9 @@ CutPlaneSave(0.2001, 0, 0.12, 1, 0, 0, 1)  # Rotor 2 Outlet
 CutPlaneSave(0.3, 0, 0.12, 1, 0, 0, 1)  # Diffuser Outlet
 for c in range(nsect):
     if c < nsect - 1:
-        plne_nme = 'CUT' + str(c + 3)
+        plne_nme = 'CUT' + str(c + len(span) + 1)
     else:
-        plne_nme = 'CUT' + str(c + 3) + '.D9'
+        plne_nme = 'CUT' + str(c + len(span) + 1) + '.D9'
     SelectFromProject(plne_nme)
     QntFieldScalar('Absolute Total Temperature')
     T0[c] = WeightedIntegral()
@@ -339,10 +340,10 @@ for i in range(nrows):
         nu2 = r[c][0] / r[c][1]
         p = Z[i] / (np.pi * np.cos(np.radians(betab[i])))
         bi = 2 * rm[c + 5] * Z[i] / \
-        2 * np.pi * r[i][1] * np.cos(np.deg2rad(betab_ind[i]))
+            2 * np.pi * r[i][1] * np.cos(np.deg2rad(betab_ind[i]))
         dia_rat = r[i][1] / rm[c + 5]
         denom = (2 / (1 - nu2)) + (2 * Z[i] * np.sqrt(1 + 0.5 * (
-        1 + nu2**2) * np.tan(np.radians(betab_ind[i]))**2)) / (np.pi * (1 + nu2))
+            1 + nu2**2) * np.tan(np.radians(betab_ind[i]))**2)) / (np.pi * (1 + nu2))
         phi = Vm[c] / U[c + 5]
         dhyd = (1 / (p + bi)) + dia_rat / denom
     dH_sf[i] = 2 * cf[i] * L * W_avg / dhyd
@@ -386,7 +387,7 @@ dH_int = dH_inc + dH_bld + dH_sf + dH_cl  # Internal Loss
 dH_par = dH_rc + dH_df + dH_lk  # Exernal Loss
 dH_act = dH_Euler + dH_par  # Actual Work Done
 Eff_isen = (dH_Euler - dH_int) / dH_act
-Eff_isen[1] = 0     #For stator row efficiency is set 0
+Eff_isen[1] = 0  # For stator row efficiency is set 0
 
 # ==============================================================================
 # Exporting data to file

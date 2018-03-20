@@ -15,8 +15,8 @@ from tabulate import tabulate
 
 # Case Data
 
-project_name = 'baseline2'
-case_name = '4kgs_SA_mav'
+project_name = 'baseline4'
+case_name = '4kgs_SA_no_boost'
 file_dir = 'C:/Users/msais/Box Sync/Thesis Work/Baseline/' + \
     project_name + '/' + project_name + '_' + case_name + '/'
 RunFile = str(project_name + '_' + case_name + '.run')
@@ -60,10 +60,10 @@ nsect = 7  # Number of planes to create
 
 # 3D-View Contour Plot
 Qnt = ['Entropy', 'Magnitude of W', 'Relative Mach Number']
-span = [0.5, 0.95]
-EntropyRange = [[-10, 120], [-10, 170]]
-WRange = [[0, 400], [0, 400]]
-RMach = [[0, 1], [0, 1], [0, 1]]
+span = [0.25, 0.5, 0.75, 0.9, 0.95]
+EntropyRange = [[-10, 120],[-10, 120],[-10, 120],[-10, 120], [-10, 170]]
+WRange = [[0, 400],[0, 400],[0, 400],[0, 400], [0, 400]]
+RMach = [[0, 1],[0, 1],[0, 1],[0, 1], [0, 1], [0, 1]]
 
 # Losses
 Qnt_LossParm = ["Incidence_Loss", "BldeLoading_Loss", "SkinFriction_Loss",
@@ -202,9 +202,9 @@ CutPlaneSave(0.2001, 0, 0.12, 1, 0, 0, 1)  # Rotor 2 Outlet
 CutPlaneSave(0.3, 0, 0.12, 1, 0, 0, 1)  # Diffuser Outlet
 for c in range(nsect):
     if c < nsect - 1:
-        plne_nme = 'CUT' + str(c + 3)
+        plne_nme = 'CUT' + str(c + len(span) + 1)
     else:
-        plne_nme = 'CUT' + str(c + 3) + '.D1'
+        plne_nme = 'CUT' + str(c + len(span) + 1) + '.D1'
     SelectFromProject(plne_nme)
     QntFieldScalar('Absolute Total Temperature')
     T0[c] = WeightedIntegral()
